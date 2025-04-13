@@ -4,6 +4,9 @@ import cookieParser from'cookie-parser'
 import express, { Application,  NextFunction,  Request, Response } from 'express';
 
 import os from "os";
+import router from './app/routers';
+import globalErrorHandler from './app/middleware/globalerrorHandler';
+import notFound from './app/middleware/NotFound';
 const app: Application = express();
 
 // Middleware to parse JSON and handle CORS
@@ -12,7 +15,7 @@ app.use(cookieParser())
 app.use(cors());
 
 // app Routes
-// app.use('/api', router);
+app.use('/api/v1', router);
 
 
 // Root route
@@ -43,10 +46,11 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
         website: "https://github.com/Pritom003",
       },
     });
+    next()
   });
 
 
 
-// app.use(globalErrorHandler);
-// app.use(notFound)
+app.use(globalErrorHandler);
+app.use(notFound)
 export default app;
