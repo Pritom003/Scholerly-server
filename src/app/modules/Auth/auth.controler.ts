@@ -1,5 +1,5 @@
 
-import { Request, Response } from 'express';
+import { Request, Response ,Express} from 'express';
 import CatchAsync from '../../utils/fetch.async';
 import sendResponse from '../../utils/sendResponse';
 import { AuthService } from './auth.service';
@@ -7,10 +7,13 @@ import { AuthService } from './auth.service';
 // import AppError from '../Errors/AppErrors';
 
 const register = CatchAsync(async (req: Request, res: Response) => {
-//   const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
 
-//   const result = await AuthService.register(req.body,files);
-  const result = await AuthService.register(req.body);
+const data = JSON.parse(req.body.formdata); 
+
+console.log(data ,files , "data i am receriving from postman as formdata");
+  const result = await AuthService.register(data,files);
+  // const result = await AuthService.register(req.body);
 
   sendResponse(res, {
     statusCode: 201,

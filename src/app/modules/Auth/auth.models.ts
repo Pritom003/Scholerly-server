@@ -25,8 +25,9 @@ const UserSchema = new mongoose.Schema<UserInterface, UserModel>(
    
     Profileimage: {
       type: String,
-      default:
-        "https://media-hosting.imagekit.io//da3192128fbf47ba/icon-7797704_1280.png?Expires=1837355766&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Isi7PB56px8a8YHL36sD-mGFswYDO~JEbKjUzJ7gP~sbSg0tvkuqrHUlt-R71yjeaLw9gEqgsIBDejosr8AyMp~B2n3Z4FDnsTvLeqsue26m7kfNvg3al7OnDpGaTIYztBC3I~F0gg2i3zygw~vhIa2hP8BZp0nOoMTFyzUXq6V0a2zsm0AELELl62VSsHZ-fJV7aItA0D6DRQjMaU0xTfYmbtjszjagi51VuK9MrZou2-2DqqtxA0IkJv83PUMlrjPQS~FCoDowLPoQOkPK17lAazSFv4Bx8Ft6SHKpAPqDbwLgXOqabC6vRa7YOhKa14uBZQxOeL2Bc8L~RBgAZg__",
+      required: true 
+      // default:
+      //   "https://media-hosting.imagekit.io//da3192128fbf47ba/icon-7797704_1280.png?Expires=1837355766&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Isi7PB56px8a8YHL36sD-mGFswYDO~JEbKjUzJ7gP~sbSg0tvkuqrHUlt-R71yjeaLw9gEqgsIBDejosr8AyMp~B2n3Z4FDnsTvLeqsue26m7kfNvg3al7OnDpGaTIYztBC3I~F0gg2i3zygw~vhIa2hP8BZp0nOoMTFyzUXq6V0a2zsm0AELELl62VSsHZ-fJV7aItA0D6DRQjMaU0xTfYmbtjszjagi51VuK9MrZou2-2DqqtxA0IkJv83PUMlrjPQS~FCoDowLPoQOkPK17lAazSFv4Bx8Ft6SHKpAPqDbwLgXOqabC6vRa7YOhKa14uBZQxOeL2Bc8L~RBgAZg__",
     },
     role: {
         type: String,

@@ -28,7 +28,7 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
   
     res.status(200).json({
       success: true,
-      message: "Welcome to the Next Mart",
+      message: "Welcome to the Schoolers",
       version: "1.0.0",
       clientDetails: {
         ipAddress: clientIp,

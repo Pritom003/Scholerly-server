@@ -14,7 +14,7 @@ const TutorSchema = new Schema<ITutor>(
     },
     email: { type: String, unique: true, required: true },
     phone: { type: String },
-    profileImage: { type: String },  
+    profileImage: { type: String , required: true },  
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],

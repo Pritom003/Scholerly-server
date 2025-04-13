@@ -2,11 +2,14 @@
 // import  { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../Errors/AppError';
-import { User } from './auth.models';
+// import { User } from './auth.models';
 import { UserInterface } from './auth.interface';
 import AuthUtils from './auth.utils';
 import mongoose from 'mongoose';
 import { Tutor } from '../Tutor/tutor.model';
+import { USER_ROLE } from './auth.constant';
+import { uploadToCloudinary } from '../../utils/UploadtoCloudinary';
+import { User } from './auth.models';
 
 
 
@@ -48,7 +51,7 @@ import { Tutor } from '../Tutor/tutor.model';
 // };
 
 
-const register = async (payload: UserInterface) => {
+const register = async (payload: UserInterface ,files:any) => {
   const isUserExists = await User.isUserExists(payload.email);
   if (isUserExists) {
     throw new AppError(400, 'User already exists');
@@ -61,10 +64,24 @@ const register = async (payload: UserInterface) => {
   try {
     // 1. Create user
     const user = new User(payload);
+      // Handle profile image upload (Optional)
+      if (files && files.ProfileImage && files.ProfileImage[0]) {
+        const file = files.ProfileImage[0];
+      
+        const result = await uploadToCloudinary(
+          file.buffer,
+          `profile_${Date.now()}`,
+          file.mimetype
+        ) as { secure_url: string };
+      
+        const profileImageUrl = result.secure_url;
+        user.Profileimage = profileImageUrl || '';
+      }
+
     await user.save({ session });
 
     // 2. If the user is a tutor, create a Tutor entry
-    if (payload.role === 'tutor') {
+    if (payload?.role === USER_ROLE.tutor) {
       const tutorData = {
         name: user.name,
         email: user.email,
