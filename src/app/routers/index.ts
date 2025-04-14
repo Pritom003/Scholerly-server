@@ -3,6 +3,7 @@ import { authRoutes } from '../modules/Auth/auth.router';
 import { BookingRoutes } from '../modules/Booking/booking.router';
 import { PaymentRoutes } from '../modules/Payment/payment.route';
 import { TutorRoutes } from '../modules/Tutor/tutor.router';
+import { ReviewRoutes } from '../modules/Review/Review.router';
 
 const router = express.Router();
 
@@ -22,6 +23,10 @@ const moduleRoutes=[
 {
    path:'/tutor',
    route:TutorRoutes
+},
+{
+   path:'/review',
+   route:ReviewRoutes
 },
 ]
 moduleRoutes.forEach(route=>router.use(route.path,route.route))

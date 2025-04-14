@@ -12,7 +12,7 @@ export interface IPayment {
 
 const paymentSchema = new Schema<IPayment>(
   {
-    studentId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    studentId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
     tutorId: { type: Schema.Types.ObjectId, ref: 'Tutor', required: true },
     bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', required: true },
     amount: { type: Number, required: true },

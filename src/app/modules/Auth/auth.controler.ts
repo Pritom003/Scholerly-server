@@ -13,7 +13,7 @@ const register = CatchAsync(async (req: Request, res: Response) => {
 
 const data = JSON.parse(req.body.formdata); 
 
-console.log(data ,files , "data i am receriving from postman as formdata");
+// console.log(data ,files , "data i am receriving from postman as formdata");
   const result = await AuthService.register(data,files);
   // const result = await AuthService.register(req.body);
 

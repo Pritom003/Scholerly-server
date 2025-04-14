@@ -5,7 +5,8 @@ import config from '../config';
 // import User from '../modules/Auth/User.model';
 import httpStatus from 'http-status';
 import AppError from '../Errors/AppError';
-import { User } from '../modules/Auth/auth.models';
+import { Users } from '../modules/Auth/auth.models';
+// import { Users } from '../modules/Auth/auth.models';
 const auth=(...requiredRoles: string[])=>{
     return CatchAsync(async(req:Request,res:Response ,
         next:NextFunction)=>
@@ -13,16 +14,18 @@ const auth=(...requiredRoles: string[])=>{
         {
         // console.log(req.headers.authorization,requiredRoles);
         const token =req.headers.authorization
+        // console.log(token);
+        // hey gpt why the token is undefined here hey gpt 
         if(!token)
         {
             throw new AppError(httpStatus.FORBIDDEN,`Unauthorized User `);
         }
         const actualToken = token.startsWith('Bearer ') ? token.slice(7) : token;
-        const decoded = jwt.verify(actualToken, config.access_token,);
+        const decoded = jwt.verify(actualToken, config.jwt_access_secret);
        
       
         const {role,email}=decoded as JwtPayload
-        const user=await User.isUserExists(email)
+        const user=await Users.isUserExists(email)
 if(!user){
     throw new AppError(401,`Invalid credentials`);
 }
