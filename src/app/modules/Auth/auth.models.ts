@@ -43,6 +43,10 @@ const UserSchema = new mongoose.Schema<UserInterface, UserModel>(
         type: Boolean,
         default: false,
       },
+      is_blocked: {
+        type: Boolean,
+        default: false,
+      },
     needsPasswordChange: {
       type: Boolean,
       default: true,
@@ -87,7 +91,7 @@ UserSchema.pre("save", async function (next) {
 
 // Check if user exists
 UserSchema.statics.isUserExists = async function (email: string) {
-  return await User.findOne({ email }).select("+password");
+  return await Users.findOne({ email }).select("+password");
 };
 
 UserSchema.statics.isPasswordMatched = async function (
@@ -105,4 +109,4 @@ UserSchema.statics.isJWTIssuedBeforePasswordChanged = function (
     new Date(passwordChangedTimestamp).getTime() / 1000;
   return passwordChangedTime > jwtIssuedTimestamp;
 };
-export const User = mongoose.model<UserInterface, UserModel>("Users", UserSchema);
+export const Users = mongoose.model<UserInterface, UserModel>("Users", UserSchema);

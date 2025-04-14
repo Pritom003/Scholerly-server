@@ -9,6 +9,7 @@ export interface UserInterface {
   role: 'tutor ' | 'student' | 'admin';
   status: 'in-progress' | 'accepted' | 'rejected';
   isDeleted?: boolean;
+  is_blocked?: boolean;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
 }

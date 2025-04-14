@@ -34,7 +34,7 @@ export interface ITutor {
     password?: string;
     isVerified?: boolean;
     loginProvider: LoginProvider;
-  
+    request?: 'pending' | 'approved' | 'rejected';
     location?: string;
     qualifications?: string[];
   

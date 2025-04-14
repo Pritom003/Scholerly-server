@@ -51,7 +51,11 @@ const TutorSchema = new Schema<ITutor>(
       enum: ['credentials', 'google', 'github'],
       default: 'credentials',
     },
-
+    request: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending'
+    },
     // Optional fields
     location: { type: String },
     qualifications: [{ type: String }],

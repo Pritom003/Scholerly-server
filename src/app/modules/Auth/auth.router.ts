@@ -6,10 +6,11 @@ import { uploadFields } from '../../middleware/upload';
 
 // import StudentValidation  from '../students/student.validation';
 const router = express.Router();
+
 router.post(
   '/create-user',uploadFields([
     { name: 'ProfileImage', maxCount: 1 },
   ]),AuthController.register
 );
-
+router.post('/login', AuthController.login);
 export const authRoutes = router;
