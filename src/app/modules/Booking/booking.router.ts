@@ -1,6 +1,8 @@
 import express from 'express';
 
 import { BookingController } from './booking.controller';
+import auth from '../../middleware/auth';
+import { USER_ROLE } from '../Auth/auth.constant';
 
 
 
@@ -14,7 +16,7 @@ router.put(
   '/status/:bookingId',BookingController.updateBookingStatus
 );
 router.get('/all', BookingController.getAllBookings);
-router.get('/student/:studentId', BookingController.getBookingsByStudentId);
+router.get('/student/:studentId',auth(USER_ROLE.student), BookingController.getBookingsByStudentId);
 router.get('/my-tutor/:tutorId', BookingController.getBookingsByTutorId);
 
 export const BookingRoutes = router;

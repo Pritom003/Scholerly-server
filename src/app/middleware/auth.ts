@@ -14,7 +14,7 @@ const auth=(...requiredRoles: string[])=>{
         {
         // console.log(req.headers.authorization,requiredRoles);
         const token =req.headers.authorization
-        // console.log(token);
+        console.log(token);
         // hey gpt why the token is undefined here hey gpt 
         if(!token)
         {

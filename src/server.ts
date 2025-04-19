@@ -2,9 +2,13 @@ import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
 import config from "./app/config";
+import { Server as SocketIOServer } from "socket.io";
 
-// 1️⃣ Declare a variable for the server
+// 1️⃣ Declare these outside the function
 let server: Server;
+let io: SocketIOServer;
+
+
 
 // 2️⃣ Main function to connect to the database and start the server
 async function main() {
@@ -16,6 +20,28 @@ async function main() {
 
     // ✅ Start the server and save the "server" instance in the variable
     server = app.listen(config.port, () => {});
+       // 3️⃣ Initialize Socket.IO server
+       io = new SocketIOServer(server, {
+        cors: {
+          origin: "*", // You can restrict this in production
+        },
+      });
+  
+      io.on("connection", (socket) => {
+        console.log("🟢 New client connected:", socket.id);
+      
+        socket.on("joinRoom", (userId: string) => {
+          console.log(`👥 User ${userId} joined room`);
+          socket.join(userId); // Room name = userId
+        });
+      
+        socket.on("disconnect", () => {
+          console.log("🔴 Client disconnected:", socket.id);
+        });
+      });
+      
+      // Make `io` available globally
+      app.set("io", io);
   } catch (err) {
     console.error("❌ Failed to connect to MongoDB:", err);
   }

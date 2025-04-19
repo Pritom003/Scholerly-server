@@ -1,17 +1,14 @@
 import { Schema, model } from 'mongoose';
-import { ITutor } from './tutor.interface';
+import { ITutor, ITutorModel } from './tutor.interface';
 
-const TutorSchema = new Schema<ITutor>(
+const TutorSchema = new Schema<ITutor, ITutorModel>(
   {
     role: {
       type: String,
       enum: ['tutor'],
       default: 'tutor',
     },
-    name: {
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-    },
+    name:{ type: String, required: true } ,
     email: { type: String, unique: true, required: true },
     phone: { type: String },
     profileImage: { type: String , required: true },  
@@ -58,11 +55,25 @@ const TutorSchema = new Schema<ITutor>(
     },
     // Optional fields
     location: { type: String },
-    qualifications: [{ type: String }],
+    qualifications: [
+      {
+        degree: { type: String, required: true },
+        institution: { type: String, required: true },
+        graduationYear: { type: Number },
+        currentYear: { type: String },
+        experience: { type: String }, 
+      }
+    ],
+    
   },
   {
     timestamps: true,
   }
 );
+// TutorSchema.statics.isOwner = async function (tutorId, userId) {
+//   const tutor = await this.findById(tutorId);
+//   if (!tutor) return false;
+//   return tutor.user.toString() === userId;
+// };
 
-export const Tutor = model<ITutor>('Tutor', TutorSchema);
+export const Tutor = model<ITutor, ITutorModel>('Tutor', TutorSchema);

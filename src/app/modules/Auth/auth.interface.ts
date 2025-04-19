@@ -1,8 +1,8 @@
 import { Model } from 'mongoose';
-import { IName } from '../Tutor/tutor.interface';
+// import { IName } from '../Tutor/tutor.interface';
 export interface UserInterface {
   _id: string;
-  name:IName;
+  name:string;
   email: string;
   password: string;
   Profileimage:string;

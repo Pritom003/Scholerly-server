@@ -12,7 +12,17 @@ const app: Application = express();
 // Middleware to parse JSON and handle CORS
 app.use(express.json());
 app.use(cookieParser())
-app.use(cors());
+app.use(express.json());
+const allowedOrigins = ['http://localhost:3000' ,'http://localhost:3001']; // Add frontend origin
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true, // Allow credentials (cookies, authorization headers)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // app Routes
 app.use('/api/v1', router);

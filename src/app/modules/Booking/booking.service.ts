@@ -1,16 +1,49 @@
+import app from "../../../app";
 import AppError from "../../Errors/AppError";
 import { IBooking } from "./booking.interface";
 import { Booking } from "./booking.models";
 
 const createBookingToDb = async (payload: IBooking): Promise<IBooking> => {
   const newBooking = await Booking.create(payload);
-  // Notify tutor via email or socket here
+
+  // Emit notification to the tutor
+  const io = app.get('io');
+  if (io) {
+    io.to(payload.tutor.toString()).emit('newBooking', {
+      message: 'You have a new booking request!',
+      booking: newBooking,
+    });
+  }
+  // as i am sending the notification to the logged in user so if i add the tutor userid i can gett the notification 
+
   return newBooking;
 };
 
 const updateStatus = async (id: string, status: string): Promise<IBooking | null> => {
-  return Booking.findByIdAndUpdate(id, { status }, { new: true });
+  const updatedBooking = await Booking.findByIdAndUpdate(id, { status }, { new: true });
+
+  // Emit notification to the student
+  const io = app.get('io');
+  if (io && updatedBooking) {
+    let message = '';
+
+    if (status === 'accepted') {
+      message = '✅ Your booking has been accepted!';
+    } else if (status === 'canceled') {
+      message = '❌ Unfortunately, your booking was rejected.';
+    } else {
+      message = `Booking status updated to "${status}".`;
+    }
+
+    io.to(updatedBooking.student.toString()).emit('bookingUpdated', {
+      message,
+      booking: updatedBooking,
+    });
+  }
+
+  return updatedBooking;
 };
+
 
 const getBookingById = async (id: string) => {
   try {

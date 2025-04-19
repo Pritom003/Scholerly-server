@@ -8,10 +8,7 @@ import { UserStatus } from "./auth.constant";
 
 const UserSchema = new mongoose.Schema<UserInterface, UserModel>(
   {
-    name: {
-        firstName: { type: String, required: true },
-        lastName: { type: String, required: true },
-      },
+    name: { type: String, required: true },
     email: {
       type: String,
       required: true,

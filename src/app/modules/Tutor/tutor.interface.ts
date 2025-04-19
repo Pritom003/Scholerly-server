@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Model, Types } from "mongoose";
 
 export interface IName {
     firstName: string;
@@ -14,7 +14,7 @@ export interface IName {
   
 export interface ITutor {
     role: 'tutor';
-    name: IName;
+    name: string;
     email: string;
     phone?: string;
     id: string;
@@ -41,4 +41,7 @@ export interface ITutor {
     createdAt?: Date;
     updatedAt?: Date;
   }
+  export type ITutorModel = Model<ITutor> & {
+    isOwner(tutorId: string, userId: string): Promise<boolean>;
+  };
   

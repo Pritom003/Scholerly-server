@@ -10,10 +10,12 @@ import { UserInterface } from './auth.interface';
 
 const register = CatchAsync(async (req: Request, res: Response) => {
   const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+  // const datas = req.body;
 
 const data = JSON.parse(req.body.formdata); 
+// const data =req
 
-// console.log(data ,files , "data i am receriving from postman as formdata");
+console.log(data ,files , "data i am receriving from postman as formdata");
   const result = await AuthService.register(data,files);
   // const result = await AuthService.register(req.body);
 
@@ -35,7 +37,18 @@ const login = CatchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const refreshToken = CatchAsync(async (req: Request, res: Response) => {
+  const { authorization } = req.headers;
 
+  const result = await AuthService.RefreshToken(authorization as string);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User logged in successfully!",
+    data: result,
+  });
+});
 
 
 const GetMyProfile = CatchAsync(async (req, res) => {
@@ -139,6 +152,7 @@ export const AuthController = {
   removeAdmin,
   makeAdmin,
   // getAlltheUser,
+  refreshToken,
   blockUser,
   updateMyProfile
 };

@@ -11,6 +11,7 @@ import { Tutor } from '../Tutor/tutor.model';
 import { USER_ROLE } from './auth.constant';
 import { uploadToCloudinary } from '../../utils/UploadtoCloudinary';
 import { Users } from './auth.models';
+import { JwtPayload } from 'jsonwebtoken';
 
 
 
@@ -46,55 +47,48 @@ const login = async (payload: UserInterface) => {
 };
 
 
-const register = async (payload: UserInterface ,files:any) => {
+const register = async (payload: UserInterface, files: any) => {
   const isUserExists = await Users.isUserExists(payload.email);
   if (isUserExists) {
     throw new AppError(400, 'User already exists');
   }
 
-  // Start session for transaction
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    // 1. Create user
     const user = new Users(payload);
-      // Handle profile image upload (Optional)
-      if (files && files.ProfileImage && files.ProfileImage[0]) {
-        const file = files.ProfileImage[0];
-      
-        const result = await uploadToCloudinary(
-          file.buffer,
-          `profile_${Date.now()}`,
-          file.mimetype
-        ) as { secure_url: string };
-      
-        const profileImageUrl = result.secure_url;
-        user.Profileimage = profileImageUrl || '';
-      }
+
+    // Upload Profile Image to Cloudinary
+    if (files && files.ProfileImage && files.ProfileImage[0]) {
+      const file = files.ProfileImage[0];
+      const result = await uploadToCloudinary(
+        file.buffer,
+        `profile_${Date.now()}`,
+        file.mimetype
+      ) as { secure_url: string };
+
+      const profileImageUrl = result.secure_url;
+      user.Profileimage = profileImageUrl || '';
+    }
 
     await user.save({ session });
 
-    // 2. If the user is a tutor, create a Tutor entry
-    if (payload?.role === USER_ROLE.tutor) {
+    // If role is tutor, create a Tutor entry
+    if (payload.role === USER_ROLE.tutor) {
       const tutorData = {
-        name: user.name,
-        email: user.email,
-        profileImage: user.Profileimage,
+        ...payload,
         user: user._id,
-        // set placeholder values for required fields
-        subjects: ['Unknown'], // default until updated
-        hourlyRate: 0, // default until updated
+        profileImage: user.Profileimage,
       };
 
       await Tutor.create([tutorData], { session });
     }
 
-    // 3. Commit transaction
     await session.commitTransaction();
     session.endSession();
 
-    // 4. Create Tokens
+    // Create access & refresh tokens
     const jwtPayload = {
       id: user._id,
       email: user.email,
@@ -117,8 +111,7 @@ const register = async (payload: UserInterface ,files:any) => {
 
     return { accessToken, refreshToken };
 
-} catch (error) {
-    // ✅ Abort only if session is still in transaction
+  } catch (error) {
     if (session.inTransaction()) {
       await session.abortTransaction();
     }
@@ -128,22 +121,24 @@ const register = async (payload: UserInterface ,files:any) => {
 };
 
 
-// const RefreshToken = async (refreshToken: string) => {
-//   if (!config.jwt_refresh_secret) {
-//     throw new AppError(500, 'JWT refresh secret is not defined');
-//   }
-//   const decoded = AuthUtils.VerifyToken(refreshToken, config.jwt_refresh_secret) as JwtPayload;
-//   const user = await User.findOne({ _id: decoded.id, is_blocked: false });
-//   if (!user) throw new AppError(404, 'No user found');
 
-//   const jwtPayload = { id: user._id, email: user.email, role: user.role, image: user.Profileimage };
-//   if (!config.jwt_access_secret || !config.jwt_access_token_expires_in) {
-//     throw new AppError(500, 'JWT configuration is not defined');
-//   }
-//   const accessToken = AuthUtils.CreateToken(jwtPayload, config.jwt_access_secret, config.jwt_access_token_expires_in);
 
-//   return { accessToken };
-// };
+const RefreshToken = async (refreshToken: string) => {
+  if (!config.jwt_refresh_secret) {
+    throw new AppError(500, 'JWT refresh secret is not defined');
+  }
+  const decoded = AuthUtils.VerifyToken(refreshToken, config.jwt_refresh_secret) as JwtPayload;
+  const user = await Users.findOne({ _id: decoded.id, is_blocked: false });
+  if (!user) throw new AppError(404, 'No user found');
+
+  const jwtPayload = { id: user._id, email: user.email, role: user.role, image: user.Profileimage, status: user.status };
+  if (!config.jwt_access_secret || !config.jwt_access_token_expires_in) {
+    throw new AppError(500, 'JWT configuration is not defined');
+  }
+  const accessToken = AuthUtils.CreateToken(jwtPayload, config.jwt_access_secret, config.jwt_access_token_expires_in);
+
+  return { accessToken };
+};
 
 
 const GetMyProfile = async (user :UserInterface) => {
@@ -293,5 +288,6 @@ export const AuthService =
   GetMyProfile,
   updateMyProfile,
   // GetAllCustomers
+  RefreshToken
 
 };

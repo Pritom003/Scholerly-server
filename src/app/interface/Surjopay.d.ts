@@ -1,6 +1,9 @@
+
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module 'shurjopay' {
     import { Logger } from 'winston';
+    import { Types } from 'mongoose';
   
     interface Credentials {
       root_url: string;
@@ -37,6 +40,7 @@ declare module 'shurjopay' {
       customer_city: string; // City of the customer making payment (Mandatory)
       customer_post_code?: string; // Postal code of the customer making payment (Optional)
       client_ip?: string; // IP address of the customer making payment (Optional)
+      customer_order_id:Types.ObjectId
       discount_amount?: number; // Total amount of discount applied to payment (Optional)
       disc_percent?: number; // Total percentage of discount applied to payment (Optional)
       customer_state?: string; // State of the customer making payment (Optional)
@@ -74,6 +78,7 @@ declare module 'shurjopay' {
   
     export interface VerificationResponse {
       id: number; // Unique identification
+      customer_order_id:Types.ObjectId
       order_id: string; // shurjoPay payment ID used for verification
       currency: string; // Currency in which the payment was made
       amount: number; // Amount paid by the customer

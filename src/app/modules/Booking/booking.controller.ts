@@ -19,7 +19,6 @@ import { BookinServices } from './booking.service';
   });
 
 
-// controller/booking.controller.ts
 const updateBookingStatus = CatchAsync(async (req: Request, res: Response) => {
     const { bookingId } = req.params;
     const { status } = req.body;

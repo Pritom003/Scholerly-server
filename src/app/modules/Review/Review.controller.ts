@@ -8,8 +8,7 @@ import { ReviewService } from './Review.service';
 
 export const createReview = CatchAsync(async (req: Request, res: Response) => {
     const userId = (req?.user as JwtPayload)?.id?.toString(); // Extract user ID as string
-  console.log(req);
-    console.log(userId, "userId in review controller");
+
   if (!userId) {
     return sendResponse(res, {
       success: false,

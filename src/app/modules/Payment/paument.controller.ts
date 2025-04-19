@@ -14,7 +14,7 @@ export const initiatePayment = CatchAsync(async (req: Request, res: Response) =>
     throw new AppError(400, "Booking must be confirmed before payment");
   }
 
-  const amount = booking.durationInHours * booking.ValuPerHour;
+  const amount = 1 * booking.ValuPerHour;
   // const student = await BookingService.getBookingStudent(bookingId); // Or booking.user if included
 
   const shurjopayPayload = {
@@ -43,17 +43,19 @@ export const initiatePayment = CatchAsync(async (req: Request, res: Response) =>
 
   throw new AppError(500, "Failed to initiate SurjoPay payment");
 });
-export const verifyPayment = CatchAsync(async (req: Request) => {
-  const { bookingId } = req.params;
+export const verifyPayment = CatchAsync(async (req: Request ,res:Response)  => {
+  // const { bookingId } = req.params;
+  const {bookingId}=req.params
+  // console.log(bookingId,'hre');
 
   const verifiedPayment = await PaymentUtils.verifyPaymentAsync(bookingId);
   const paymentData = verifiedPayment[0];
-
+console.log(paymentData,'from here');
   if (!paymentData) {
     throw new AppError(404, "Payment not found");
   }
-  if (verifiedPayment.length) {
-  await BookinServices.updateBookingPaymentSuccess(bookingId, {
+  if (paymentData?.sp_message=== 'Success') {
+  await BookinServices.updateBookingPaymentSuccess(paymentData?.customer_order_id.toString(), {
     bank_status: paymentData.bank_status,
     sp_code: paymentData.sp_code,
     sp_message: paymentData.sp_message,
@@ -62,8 +64,10 @@ export const verifyPayment = CatchAsync(async (req: Request) => {
     date_time: paymentData.date_time,
     transactionId: paymentData.id, // Updated to match the correct property name in VerificationResponse
   });
-  
+  res.status(200).json({ success: true, message: "Payment verified" }); // ✅ Add this
+  return;
   }
+  
 
 });
 

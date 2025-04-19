@@ -7,7 +7,7 @@ export interface IBooking {
   tutor: Types.ObjectId;       // Reference to User (tutor)
   subject: string;
   bookingDate: Date;
-  durationInHours: number;
+  // durationInHours: number;
   ValuPerHour: number;
   status: BookingStatus;
   paymentIntentId?: string;    // Optional: for Stripe/SSLCommerz
