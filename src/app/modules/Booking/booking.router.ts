@@ -18,5 +18,7 @@ router.put(
 router.get('/all', BookingController.getAllBookings);
 router.get('/student/:studentId',auth(USER_ROLE.student), BookingController.getBookingsByStudentId);
 router.get('/my-tutor/:tutorId', BookingController.getBookingsByTutorId);
+router.get('/payment-history', auth(USER_ROLE.student), BookingController.getPaymentHistory);
+
 
 export const BookingRoutes = router;

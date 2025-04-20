@@ -63,13 +63,25 @@ const updateBookingStatus = CatchAsync(async (req: Request, res: Response) => {
       data: bookings,
     });
   });
-  
+  const getPaymentHistory = CatchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.id; // Assuming decoded token is added in middleware
+  // console.log(userId);
+  const paymentHistory = await BookinServices.getPaymentHistoryByStudentId(userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payment history retrieved successfully!",
+    data: paymentHistory,
+  });
+});
+
 
   export const BookingController = {
     createBooking,
     updateBookingStatus,
     getAllBookings,
     getBookingsByStudentId,
-    getBookingsByTutorId,
+    getBookingsByTutorId,getPaymentHistory
   };
   

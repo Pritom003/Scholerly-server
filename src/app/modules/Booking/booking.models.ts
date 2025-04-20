@@ -20,6 +20,7 @@ const bookingSchema = new Schema<IBooking>(
          sp_message: String,
          method: String,
          date_time: String,
+         totalAmout:Number
        },
   },
   {

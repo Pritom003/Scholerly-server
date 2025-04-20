@@ -15,8 +15,8 @@ async function main() {
   try {
     // ✅ Connect to MongoDB (If MongoDB connection fails, it will throw an error)
     await mongoose.connect(config.DB_URL as string);
-    console.log("✅ Connected to MongoDB successfully!");
-    console.log("✅ running on port", config.port);
+    // console.log("✅ Connected to MongoDB successfully!");
+    // console.log("✅ running on port", config.port);
 
     // ✅ Start the server and save the "server" instance in the variable
     server = app.listen(config.port, () => {});
@@ -28,15 +28,15 @@ async function main() {
       });
   
       io.on("connection", (socket) => {
-        console.log("🟢 New client connected:", socket.id);
+        // console.log("🟢 New client connected:", socket.id);
       
         socket.on("joinRoom", (userId: string) => {
-          console.log(`👥 User ${userId} joined room`);
+          // console.log(`👥 User ${userId} joined room`);
           socket.join(userId); // Room name = userId
         });
       
         socket.on("disconnect", () => {
-          console.log("🔴 Client disconnected:", socket.id);
+          // console.log("🔴 Client disconnected:", socket.id);
         });
       });
       

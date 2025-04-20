@@ -144,8 +144,8 @@ const RefreshToken = async (refreshToken: string) => {
 const GetMyProfile = async (user :UserInterface) => {
   const result = await Users.findOne({
     email: user.email,
-    is_blocked: false,
-  }).select('-is_blocked -createdAt -updatedAt');
+  
+  }).select(' -createdAt -updatedAt');
 
   if (!result) {
     throw new AppError(404, 'User not found');
@@ -178,51 +178,52 @@ const GetMyProfile = async (user :UserInterface) => {
 
 const updateMyProfile = async (files: any, user: any, data: any) => {
   try {
-    // console.log("Received files in service:", files);  // Check if files are received properly
     const existingUser = await Users.findById(user.id).select("+password");
     if (!existingUser) {
-      // console.error("User not found");
       throw new AppError(404, "User not found");
     }
-    // console.log("User found:", existingUser); // Confirm the user is found
 
-    // If file exists, upload to Cloudinary
-    const file = files;
-    // console.log("Uploading image:", file);  // Log the file before uploading
-    const result = await uploadToCloudinary(file.buffer, `profile_${Date.now()}`, file.mimetype) as { secure_url: string };
-    const profileImageUrl = result.secure_url;
-    // console.log("Uploaded image URL:", profileImageUrl);  // Log the URL after upload
-    existingUser.Profileimage = profileImageUrl;  // Set the new profile image URL
+    // ✅ Handle optional image upload
+    if (files?.ProfileImage?.[0]) {
+      const file = files.ProfileImage[0]; // ✅ Get the first uploaded file
 
-    // Check and update password if provided
-    if (data.oldPassword && !(await Users.isPasswordMatched(data.oldPassword, existingUser.password))) {
-      // console.error("Old password does not match");
-      throw new AppError(401, 'Old password does not match');
+      const result = await uploadToCloudinary(
+        file.buffer,
+        `profile_${Date.now()}`,
+        file.mimetype
+      ) as { secure_url: string };
+
+      existingUser.Profileimage = result.secure_url;
+      console.log('✅ New profile image uploaded:', result.secure_url);
     }
 
-    // Update the password if provided
+    // ✅ Password update check
+    if (
+      data.oldPassword &&
+      !(await Users.isPasswordMatched(data.oldPassword, existingUser.password))
+    ) {
+      throw new AppError(401, "Old password does not match");
+    }
+
     if (data.newPassword) {
-      const newHashedPassword = await bcrypt.hash(data.newPassword, Number(config.bcrypt_salt_rounds));
+      const newHashedPassword = await bcrypt.hash(
+        data.newPassword,
+        Number(config.bcrypt_salt_rounds)
+      );
       existingUser.password = newHashedPassword;
       existingUser.needsPasswordChange = false;
       existingUser.passwordChangedAt = new Date();
     }
 
-    // Update user details
+    // ✅ Update other fields
     existingUser.name = data.name || existingUser.name;
-    // console.log("Updating user:", existingUser);
 
-    // Save updated user data
     await Users.findByIdAndUpdate(existingUser.id, existingUser);
-    // console.log("User updated successfully");
-
     return existingUser;
   } catch (error: any) {
-    // console.error("Error occurred:", error);  // Log the error if any occurs
     throw new AppError(error.statusCode || 500, error.message || "Something went wrong");
   }
 };
-
 
 
 const BlockUser = async (UserID: string) => {
@@ -288,6 +289,6 @@ export const AuthService =
   GetMyProfile,
   updateMyProfile,
   // GetAllCustomers
-  RefreshToken
-
+  RefreshToken,
+ 
 };

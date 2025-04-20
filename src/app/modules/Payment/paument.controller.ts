@@ -62,6 +62,7 @@ console.log(paymentData,'from here');
     transactionStatus: paymentData.transaction_status,
     method: paymentData.method,
     date_time: paymentData.date_time,
+    totalAmout:paymentData.received_amount,
     transactionId: paymentData.id, // Updated to match the correct property name in VerificationResponse
   });
   res.status(200).json({ success: true, message: "Payment verified" }); // ✅ Add this

@@ -15,7 +15,7 @@ const register = CatchAsync(async (req: Request, res: Response) => {
 const data = JSON.parse(req.body.formdata); 
 // const data =req
 
-console.log(data ,files , "data i am receriving from postman as formdata");
+// console.log(data ,files , "data i am receriving from postman as formdata");
   const result = await AuthService.register(data,files);
   // const result = await AuthService.register(req.body);
 
@@ -51,21 +51,7 @@ const refreshToken = CatchAsync(async (req: Request, res: Response) => {
 });
 
 
-const GetMyProfile = CatchAsync(async (req, res) => {
-  const user = req.user as UserInterface;
-  
-  if (!user || !user._id) {
-    throw new AppError(401, 'Unauthorized');
-  }
-  const result = await AuthService.GetMyProfile(user);
 
-  sendResponse(res, {
-    success: true,
-    statusCode: 200,
-    message: 'User profile fetched successfully',
-    data: result,
-  });
-});
 
 // const getAlltheUser = CatchAsync(async (req, res) => {
 //   const result = await AuthService.GetAllCustomers(req.query);
@@ -81,10 +67,10 @@ const GetMyProfile = CatchAsync(async (req, res) => {
 const updateMyProfile = CatchAsync(async (req, res) => {
   // console.log("Received file:", req.file);  // Log to confirm the file is received
   const { oldPassword, newPassword, ...body } = req.body;
-  const files = req.file;  // Single file uploaded
+  const files = req.files;  // Single file uploaded
   const user = req.user;
-  // console.log(user);
-
+  console.log(user);
+console.log(req.files);
   const result = await AuthService.updateMyProfile(files, user, { ...body, oldPassword, newPassword });
 
   sendResponse(res, {
@@ -144,15 +130,31 @@ const deleteUser = CatchAsync(async (req, res) => {
   });
 });
 
+const getMyProfile = CatchAsync(async (req, res) => {
+  const user = req.user as UserInterface ;
+// console.log(user);
+  if (!user) {
+    throw new AppError(401, 'Unauthorized');
+  }
+  const result = await AuthService.GetMyProfile(user);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: 'User profile fetched successfully',
+    data: result,
+  });
+});
+// Removed duplicate declaration of updateMyProfile
 export const AuthController = {
   register,
   login,
-  GetMyProfile,
+
   deleteUser,
   removeAdmin,
   makeAdmin,
-  // getAlltheUser,
+  getMyProfile,
   refreshToken,
   blockUser,
-  updateMyProfile
+  updateMyProfile,
 };

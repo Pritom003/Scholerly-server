@@ -108,6 +108,9 @@ const getBookingsByTutorId = async (tutorId: string): Promise<IBooking[]> => {
     .populate('tutor')
     .sort({ createdAt: -1 });
 };
+const getPaymentHistoryByStudentId = async (studentId: string) => {
+  return Booking.find({ student: studentId, status: "Paid" }).populate("tutor");
+};
 
 export const BookinServices = {
   createBookingToDb,
@@ -116,5 +119,5 @@ export const BookinServices = {
   updateBookingPaymentSuccess,
   getAllBookings,
   getBookingsByStudentId,
-  getBookingsByTutorId,
+  getBookingsByTutorId,getPaymentHistoryByStudentId
 };
