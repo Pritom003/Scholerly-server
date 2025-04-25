@@ -9,17 +9,36 @@ class QueryBuilder<T> {
     this.query = query;
   }
 
-  search(searchableFields: string[]) {
-    const search = this?.query?.search;
+  searchAndFilter(searchableFields: string[]) {
+    const queryObj: Record<string, any> = { ...this.query };
+    const excludeFields = ['search', 'sortOrder', 'sortBy', 'limit', 'page', 'fields', 'minPrice', 'maxPrice', 'minRating', 'role'];
+    excludeFields.forEach((el) => delete queryObj[el]);
+  
+    // Handle search
+    const search = this.query.search;
     if (search) {
-      this.modelQuery = this.modelQuery.find({
-        $or: searchableFields.map((field) => ({
-          [field]: { $regex: search, $options: 'i' },
-        })),
-      });
+      queryObj.$or = searchableFields.map((field) => ({
+        [field]: { $regex: search, $options: 'i' },
+      }));
     }
+  
+    // Handle filters
+    if (this.query.role) {
+      queryObj.role = this.query.role;
+    }
+    if (this.query.minPrice || this.query.maxPrice) {
+      queryObj.hourlyRate = {};
+      if (this.query.minPrice) queryObj.hourlyRate.$gte = Number(this.query.minPrice);
+      if (this.query.maxPrice) queryObj.hourlyRate.$lte = Number(this.query.maxPrice);
+    }
+    if (this.query.minRating) {
+      queryObj.avgRating = { $gte: Number(this.query.minRating) };
+    }
+  
+    this.modelQuery = this.modelQuery.find(queryObj);
     return this;
   }
+  
 
   filter() {
     const queryObj = { ...this.query };
@@ -59,7 +78,7 @@ class QueryBuilder<T> {
 
   paginate() {
     const page = Number(this?.query?.page) || 1;
-    const limit = Number(this?.query?.limit) || 10;
+    const limit = Number(this?.query?.limit) || 100000000;
     const skip = (page - 1) * limit;
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);

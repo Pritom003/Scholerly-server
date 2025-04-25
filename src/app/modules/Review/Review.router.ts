@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Route to initiate SurjoPay payment
 router.post('/', auth(USER_ROLE.admin,USER_ROLE.student,USER_ROLE.tutor),ReviewController.createReview);
+router.get('/', ReviewController.gealltreviews);
 router.get('/:tutorId', ReviewController.getProductReviews);
 router.delete('/:reviewId',auth(USER_ROLE.admin,USER_ROLE.student,USER_ROLE.tutor), ReviewController.deleteReview);
 router.put('/:reviewId',auth(USER_ROLE.admin,USER_ROLE.student,USER_ROLE.tutor), ReviewController.updateReview);

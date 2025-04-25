@@ -1,20 +1,20 @@
-import app from "../../../app";
+
+import QueryBuilder from "../../Builder/queryBuilder";
 import AppError from "../../Errors/AppError";
+import { NotificationService } from "../Notification/Notificaton.service";
 import { IBooking } from "./booking.interface";
 import { Booking } from "./booking.models";
 
 const createBookingToDb = async (payload: IBooking): Promise<IBooking> => {
   const newBooking = await Booking.create(payload);
 
-  // Emit notification to the tutor
-  const io = app.get('io');
-  if (io) {
-    io.to(payload.tutor.toString()).emit('newBooking', {
-      message: 'You have a new booking request!',
-      booking: newBooking,
-    });
-  }
-  // as i am sending the notification to the logged in user so if i add the tutor userid i can gett the notification 
+  await NotificationService.createNotification({
+    userId: payload.tutor.toString(),
+    message: '📆 You have a new booking request!',
+    type: 'booking',
+    isRead: false,
+  });
+  
 
   return newBooking;
 };
@@ -23,23 +23,16 @@ const updateStatus = async (id: string, status: string): Promise<IBooking | null
   const updatedBooking = await Booking.findByIdAndUpdate(id, { status }, { new: true });
 
   // Emit notification to the student
-  const io = app.get('io');
-  if (io && updatedBooking) {
-    let message = '';
-
-    if (status === 'accepted') {
-      message = '✅ Your booking has been accepted!';
-    } else if (status === 'canceled') {
-      message = '❌ Unfortunately, your booking was rejected.';
-    } else {
-      message = `Booking status updated to "${status}".`;
-    }
-
-    io.to(updatedBooking.student.toString()).emit('bookingUpdated', {
+  const message = `📆 Your booking status has been ${status}ed .`;
+  if (updatedBooking && updatedBooking.student) {
+    await NotificationService.createNotification({
+      userId: updatedBooking.student.toString(),
       message,
-      booking: updatedBooking,
+      type: 'booking',
+      isRead: false,
     });
   }
+  
 
   return updatedBooking;
 };
@@ -86,12 +79,30 @@ export const updateBookingPaymentSuccess = async (
   );
 };
 // Get all bookings
-const getAllBookings = async (): Promise<IBooking[]> => {
-  return Booking.find()
-    .populate('student')
-    .populate('tutor')
-    .sort({ createdAt: -1 });
+// Service
+const getAllBookings = async (query: Record<string, any>) => {
+  const queryBuilder = new QueryBuilder<IBooking>(
+    Booking.find().populate('student').populate('tutor'),
+    query
+  )
+    .searchAndFilter(['student.name', 'tutor.name', 'transaction.transactionId'])
+    .sort()
+    .paginate();
+
+  const data = await queryBuilder.modelQuery;
+  const total = await queryBuilder.getCountQuery();
+
+  return {
+    data,
+    meta: {
+      total,
+      page: Number(query.page) || 1,
+      limit: Number(query.limit) || 6,
+      totalPages: Math.ceil(total / (Number(query.limit) || 6)),
+    },
+  };
 };
+
 
 // Get bookings by student ID
 const getBookingsByStudentId = async (studentId: string): Promise<IBooking[]> => {

@@ -32,15 +32,19 @@ const updateBookingStatus = CatchAsync(async (req: Request, res: Response) => {
     });
   });
   
-  const getAllBookings = CatchAsync(async (req: Request, res: Response) => {
-    const bookings = await BookinServices.getAllBookings();
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: 'All bookings retrieved successfully!',
-      data: bookings,
-    });
+ // Controller
+const getAllBookings = CatchAsync(async (req: Request, res: Response) => {
+  const result = await BookinServices.getAllBookings(req.query);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'All bookings retrieved successfully!',
+    data: result.data,
+
   });
+});
+
   
   const getBookingsByStudentId = CatchAsync(async (req: Request, res: Response) => {
     const { studentId } = req.params;
@@ -55,6 +59,7 @@ const updateBookingStatus = CatchAsync(async (req: Request, res: Response) => {
   
   const getBookingsByTutorId = CatchAsync(async (req: Request, res: Response) => {
     const { tutorId } = req.params;
+    console.log(tutorId, "tutorId");
     const bookings = await BookinServices.getBookingsByTutorId(tutorId);
     sendResponse(res, {
       statusCode: 200,

@@ -15,6 +15,7 @@ router.post(
   ]),AuthController.register
 );
 router.post('/login', AuthController.login);
+router.get('/',auth(USER_ROLE.admin),AuthController.getAlltheUser)
 router.post(
   '/refresh-token',
 
@@ -33,4 +34,8 @@ router.post(
   ]),
   AuthController.updateMyProfile
 );
+router.patch('/block-user/:userId',auth(USER_ROLE.admin) , AuthController.blockUser)
+router.patch('/make-admin/:userId',auth(USER_ROLE.admin) , AuthController.makeAdmin)
+router.patch('/approve-tutor/:userId',auth(USER_ROLE.admin) , AuthController.approveTutor)
+router.delete('/:userId',auth(USER_ROLE.admin) , AuthController.deleteUser)
 export const authRoutes = router;

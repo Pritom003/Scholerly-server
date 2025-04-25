@@ -40,8 +40,8 @@ export const getProductReviews = CatchAsync(async (req: Request, res: Response) 
 
 export const deleteReview = CatchAsync(async (req: Request, res: Response) => {
   const { reviewId } = req.params;
-  const userId= req.user?._id.toString(); 
-  const { isAdmin } = req.body; // Assuming userId and isAdmin are passed in the request body
+  const userId= req.user?.id; 
+  const isadmin  = req.user.role; // Assuming userId and isAdmin are passed in the request body
   if (!userId) {
     return sendResponse(res, {
       success: false,
@@ -50,7 +50,7 @@ export const deleteReview = CatchAsync(async (req: Request, res: Response) => {
       data: null,
     });
   }
-  await ReviewService.deleteReview(reviewId, userId, isAdmin);
+  await ReviewService.deleteReview(reviewId, userId,isadmin);
   res.status(200).json({ success: true, message: 'Review deleted' });
   sendResponse(res, {
     success: true,
@@ -59,7 +59,16 @@ export const deleteReview = CatchAsync(async (req: Request, res: Response) => {
     data: {}
   });
 });
-
+  
+const gealltreviews = CatchAsync(async (req: Request, res: Response) => {
+  const reviews= await ReviewService.getAllReviews();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'All reviews retrieved successfully!',
+    data: reviews,
+  });
+});
 export const updateReview = CatchAsync(async (req: Request, res: Response) => {
   const { reviewId } = req.params;
   const { userId } = req.body; // Assuming userId is passed in the request body
@@ -73,4 +82,4 @@ export const updateReview = CatchAsync(async (req: Request, res: Response) => {
 });
 
 
-export const ReviewController = { createReview, getProductReviews, deleteReview, updateReview };
+export const ReviewController = { createReview, getProductReviews, deleteReview, updateReview,gealltreviews };

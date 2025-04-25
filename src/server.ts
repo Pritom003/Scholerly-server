@@ -1,12 +1,13 @@
 import { Server } from "http";
 import mongoose from "mongoose";
-import app from "./app";
+// import app from "./app";
 import config from "./app/config";
-import { Server as SocketIOServer } from "socket.io";
+import app from "./app";
+// import { Server as SocketIOServer } from "socket.io";
 
 // 1️⃣ Declare these outside the function
 let server: Server;
-let io: SocketIOServer;
+// let io: SocketIOServer;
 
 
 
@@ -18,30 +19,30 @@ async function main() {
     // console.log("✅ Connected to MongoDB successfully!");
     // console.log("✅ running on port", config.port);
 
-    // ✅ Start the server and save the "server" instance in the variable
+    // // ✅ Start the server and save the "server" instance in the variable
     server = app.listen(config.port, () => {});
-       // 3️⃣ Initialize Socket.IO server
-       io = new SocketIOServer(server, {
-        cors: {
-          origin: "*", // You can restrict this in production
-        },
-      });
+    //    // 3️⃣ Initialize Socket.IO server
+    //    io = new SocketIOServer(server, {
+    //     cors: {
+    //       origin: "*", // You can restrict this in production
+    //     },
+    //   });
   
-      io.on("connection", (socket) => {
-        // console.log("🟢 New client connected:", socket.id);
+    //   io.on("connection", (socket) => {
+    //     // console.log("🟢 New client connected:", socket.id);
       
-        socket.on("joinRoom", (userId: string) => {
-          // console.log(`👥 User ${userId} joined room`);
-          socket.join(userId); // Room name = userId
-        });
+    //     socket.on("joinRoom", (userId: string) => {
+    //       console.log(`👥 User ${userId} joined room`);
+    //       socket.join(userId); // Room name = userId
+    //     });
       
-        socket.on("disconnect", () => {
-          // console.log("🔴 Client disconnected:", socket.id);
-        });
-      });
+    //     socket.on("disconnect", () => {
+    //       console.log("🔴 Client disconnected:", socket.id);
+    //     });
+    //   });
       
-      // Make `io` available globally
-      app.set("io", io);
+    //   // Make `io` available globally
+    //   app.set("io", io);
   } catch (err) {
     console.error("❌ Failed to connect to MongoDB:", err);
   }

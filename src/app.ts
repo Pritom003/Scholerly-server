@@ -13,7 +13,8 @@ const app: Application = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(express.json());
-const allowedOrigins = ['http://localhost:3000' ,'http://localhost:3001']; // Add frontend origin
+const allowedOrigins = ['http://localhost:3000' ,'http://localhost:3001',
+  'https://sholerly-client.vercel.app', 'https://scholarly-server-five.vercel.app']; // Add frontend origin
 
 app.use(
   cors({

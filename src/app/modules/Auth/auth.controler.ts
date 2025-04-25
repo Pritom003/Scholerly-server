@@ -53,17 +53,17 @@ const refreshToken = CatchAsync(async (req: Request, res: Response) => {
 
 
 
-// const getAlltheUser = CatchAsync(async (req, res) => {
-//   const result = await AuthService.GetAllCustomers(req.query);
+const getAlltheUser = CatchAsync(async (req, res) => {
+const result = await AuthService.GetAllUSers(req.query);
 
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: 200,
-//     message: 'Customers fetched successfully',
-//     // meta: result.meta,
-//     data: result.data,
-//   });
-// });
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: 'Customers fetched successfully',
+    // meta: result.meta,
+    data: result.data,
+  });
+});
 const updateMyProfile = CatchAsync(async (req, res) => {
   // console.log("Received file:", req.file);  // Log to confirm the file is received
   const { oldPassword, newPassword, ...body } = req.body;
@@ -97,6 +97,18 @@ const blockUser = CatchAsync(async (req, res) => {
 const makeAdmin = CatchAsync(async (req, res) => {
   const { userId } = req.params;
   await AuthService.MakeAdmin(userId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "User is now an Admin",
+    data: {},
+  });
+});
+const approveTutor = CatchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const status=req.body.status
+  await AuthService.ApproveTutor(userId,status);
 
   sendResponse(res, {
     success: true,
@@ -156,5 +168,5 @@ export const AuthController = {
   getMyProfile,
   refreshToken,
   blockUser,
-  updateMyProfile,
+  updateMyProfile,getAlltheUser,approveTutor
 };

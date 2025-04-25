@@ -12,6 +12,9 @@ import { USER_ROLE } from './auth.constant';
 import { uploadToCloudinary } from '../../utils/UploadtoCloudinary';
 import { Users } from './auth.models';
 import { JwtPayload } from 'jsonwebtoken';
+import QueryBuilder from '../../Builder/queryBuilder';
+
+import { NotificationService } from '../Notification/Notificaton.service';
 
 
 
@@ -42,8 +45,12 @@ const login = async (payload: UserInterface) => {
     config.jwt_access_secret as string,
     config.jwt_access_token_expires_in as string,
   );
-
-  return { accessToken };
+  const refreshToken = AuthUtils.CreateToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_token_expires_in as string,
+  );
+  return { accessToken,refreshToken };
 };
 
 
@@ -83,6 +90,13 @@ const register = async (payload: UserInterface, files: any) => {
       };
 
       await Tutor.create([tutorData], { session });
+      await NotificationService.createNotification({
+        userId: 'admin', // or actual admin user ID if dynamic
+        message: `🧑‍🏫 New tutor "${user.name}" has registered.`,
+        type: 'approval',
+        isRead: false,
+      });
+      
     }
 
     await session.commitTransaction();
@@ -154,26 +168,26 @@ const GetMyProfile = async (user :UserInterface) => {
   return result;
 };
 
-// const GetAllCustomers = async (query: Record<string, unknown>) => {
-//   const queryBuilder = new QueryBuilder(User.find({ role: ['USER', 'ADMIN'] }), query);
+const GetAllUSers = async (query: Record<string, unknown>) => {
+  const queryBuilder = new QueryBuilder(Users.find({ role: { $in: [USER_ROLE.student, USER_ROLE.admin, USER_ROLE.tutor] } }), query);
 
-//   const users = await queryBuilder
-//     .search(['name', 'email'])
-//     .filter()
-//     .sort()
-//     .fields()
-//     .modelQuery.select('-password -updatedAt');
+  const users = await queryBuilder
+    .searchAndFilter(['name', 'email','role'])
+    .filter()
+    .sort()
+    .fields()
+    .modelQuery.select('-password -updatedAt');
 
-//   const total = await queryBuilder.getCountQuery();
+  const total = await queryBuilder.getCountQuery();
 
-//   return {
-//     meta: {
-//       total,
-//       ...queryBuilder.getPaginationInfo(),
-//     },
-//     data: users,
-//   };
-// };
+  return {
+    meta: {
+      total,
+      ...queryBuilder.getPaginationInfo(),
+    },
+    data: users,
+  };
+};
 
 
 const updateMyProfile = async (files: any, user: any, data: any) => {
@@ -278,6 +292,32 @@ const DeleteUser = async (UserId: string) => {
 
   return { message: "User deleted successfully" };
 };
+const ApproveTutor = async (userId: string, status: "in-progress" | "accepted" | "rejected") => {
+  const user = await Users.findById(userId);
+
+  if (!user || user.role !== USER_ROLE.tutor) {
+    throw new AppError(404, "Tutor not found or invalid role");
+  }
+
+  if (user.status === 'accepted') {
+    throw new AppError(400, "Tutor already approved");
+  }
+
+  user.status = status;
+  await user.save();
+
+  await NotificationService.createNotification({
+    userId: user._id.toString(),
+    message: '✅ Congratulations! Your tutor profile has been approved.',
+    type: 'approval',
+    isRead: false,
+  });
+  
+  return {
+    message: "Tutor approved successfully",
+  };
+};
+
 
 export const AuthService = 
 { register ,
@@ -288,7 +328,7 @@ export const AuthService =
   BlockUser,
   GetMyProfile,
   updateMyProfile,
-  // GetAllCustomers
-  RefreshToken,
+  GetAllUSers,
+  RefreshToken,ApproveTutor
  
 };

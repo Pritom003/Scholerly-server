@@ -10,7 +10,7 @@ import { UpdateQuery } from 'mongoose';
     const tutorsQuery = Tutor.find(); // initial mongoose query
 
     const queryBuilder = new QueryBuilder<ITutor>(tutorsQuery, query)
-      .search(['name.firstname', 'name.lastname', 'subjects', 'specialization', 'bio']) // searchable fields
+      .searchAndFilter(['name', 'subjects', 'specialization', 'bio']) // searchable fields
       .filter()
       .sort()
       .paginate()

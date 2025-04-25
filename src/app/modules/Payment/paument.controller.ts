@@ -50,7 +50,7 @@ export const verifyPayment = CatchAsync(async (req: Request ,res:Response)  => {
 
   const verifiedPayment = await PaymentUtils.verifyPaymentAsync(bookingId);
   const paymentData = verifiedPayment[0];
-console.log(paymentData,'from here');
+// console.log(paymentData,'from here');
   if (!paymentData) {
     throw new AppError(404, "Payment not found");
   }
