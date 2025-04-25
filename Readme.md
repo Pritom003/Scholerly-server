@@ -1,14 +1,13 @@
 
 ---
 
-### ✅ `backend/README.md` — **Scholerly Backend**
+### Scholerly Backend
 
-```md
+
 # Scholerly 🎓 - Backend
 
 TutorLink's backend is a powerful, scalable REST API built with **Node.js**, **Express**, **TypeScript**, and **MongoDB**. It handles authentication, role-based access control, tutor management, bookings, payments, and real-time event handling with Socket.IO.
 
----
 
 ## 🔧 Tech Stack
 
@@ -54,3 +53,31 @@ SP_PASSWORD=your-password
 SP_PREFIX=your-prefix
 SP_RETURN_URL=https://your-client-url/verifyPayment
 ```
+
+
+## 🌟 Key Features
+
+- 🧾 Modular architecture with clean service/controller separation
+- 🔐 JWT-based Auth for students, tutors, and admins
+- 🧑‍🏫 Tutor registration in both `User` and `Tutor` collections
+- 📚 Booking system with SurjoPay integration
+- ✅ Admin approval system for tutors
+- 🔔 Real-time socket notifications:
+  - Tutor registration → Admin alert
+  - Booking → Tutor alert
+  - Approval → Student alert
+- 🧮 QueryBuilder class for flexible filtering and pagination
+
+---
+
+## ⚙️ Installation & Running
+
+```bash
+# Install dependencies
+npm install
+
+# Run in development
+npm run dev
+
+# Run in production
+npm run build && npm start
